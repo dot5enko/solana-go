@@ -64,9 +64,26 @@ func (cl *Client) LogsSubscribeMentions(
 	// (optional)
 	commitment rpc.CommitmentType,
 ) (*LogSubscription, error) {
+
+	// reuse generic code
+	return cl.LogsSubscribeMultipleMentions(commitment, mentions)
+}
+
+func (cl *Client) LogsSubscribeMultipleMentions(
+	// (optional)
+	commitment rpc.CommitmentType,
+	// Subscribe to all transactions that mention the provided Pubkey.
+	mentions ...solana.PublicKey,
+) (*LogSubscription, error) {
+
+	mentionsKeys := make([]string, 0)
+	for _, it := range mentions {
+		mentionsKeys = append(mentionsKeys, it.String())
+	}
+
 	return cl.logsSubscribe(
 		rpc.M{
-			"mentions": []string{mentions.String()},
+			"mentions": mentionsKeys,
 		},
 		commitment,
 	)
